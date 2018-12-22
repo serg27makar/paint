@@ -16,9 +16,10 @@ function router(request, response){
             request.on("end", function(){
                 var paintData = JSON.parse(fileData);
                 var saveData = JSON.stringify(paintData.data);
-                var adress =__dirname +"/paintData/"+ paintData.saveName;
-
-                fs.writeFile( path.resolve(adress),saveData,function () {
+                var adress =path.resolve("./paintData/", paintData.saveName);
+                console.log(adress);
+                fs.writeFile( adress,saveData,function (err) {
+                    console.log(err);
                 })
 
             });
@@ -28,7 +29,7 @@ function router(request, response){
         break;
         case "/api/list-data":
         {
-           fs.readdir("./paintData/",function (error,files) {
+           fs.readdir(path.resolve("./paintData/"),function (error,files) {
                dirArr = JSON.stringify(files);
                console.log(dirArr);
                if (error){
@@ -43,7 +44,7 @@ function router(request, response){
         case "/api/load-data":
         {
             request.on("data",function (fileName) {
-                fs.readFile("./paintData/" + fileName,
+                fs.readFile(path.resolve("./paintData/" + fileName),
                     function(error,data){
                         var fileData = data;
                         if (error){
