@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<meta charset="UTF8">
+	<body>
+		<canvas height="600" width="800" id="canv"></canvas>
+		<br>
+
+		<button id="op_line">Line</button>
+		<button id="op_circle">Circle</button>
+		<button id="op_curve">Curve</button>
+		<button id="op_rect">rect</button>
+
+		<input type="range" id="op_line_width" name="line_width" min="1" max="100" value="1">
+		<label for="op_line_width">Line width</label>
+
+		<input type="color" id="op_line_color" name="line_color" value="#000000"></input>
+		<label for="op_line_color">Line color</label>
+
+		<input type="checkbox"id="op_fill_color"><input type="color" id="op_fill" name="line_color" value="#000000"> </input>
+		<label for="op_fill_color">Fill color</label>
+
+		<div id="operationList">Operation List</div>
+
+		<br>
+
+		<button id="file_save">Save</button>
+		<button id="file_load">Load</button>
+		<button id="op_select">Salect</button>
+
+		<div id="textBox">
+			<input type="number" id="textSise" value="20">size</input>
+			<select id="styleType">
+				<option id="styleType_Serif">Serif</option>
+				<option id="styleType_Sans_serif">Sans serif</option>
+				<option id="styleType_Cursive">Cursive</option>
+				<option id="styleType_Fantasy">Fantasy</option>
+				<option id="styleType_monospace">Monospace</option>
+			</select>
+			<button id="op_text">Text</button>
+
+		</div>
+
+		<link rel="stylesheet" href="paint.css">
+		<script src="paint.js"></script>
+		<script src="xhr.js"></script>
+	</body>	
+</html>
