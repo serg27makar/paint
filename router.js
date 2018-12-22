@@ -1,6 +1,7 @@
 var storageData = null;
 var static = require("./static").static;
 var fs = require('fs');
+var path = require('path');
 var dirArr = [];
 function router(request, response){
     switch(request.url){
@@ -14,9 +15,12 @@ function router(request, response){
             });
             request.on("end", function(){
                 var paintData = JSON.parse(fileData);
-                var saveData = JSON.stringify(paintData.data)
-                fs.writeFile("paintData/"+ paintData.saveName,saveData,function () {
+                var saveData = JSON.stringify(paintData.data);
+                var adress =__dirname +"/paintData/"+ paintData.saveName;
+
+                fs.writeFile( path.resolve(adress),saveData,function () {
                 })
+
             });
             response.writeHead(200, { 'Content-Type': 'text/html' });
             response.end('OK');
