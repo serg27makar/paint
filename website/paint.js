@@ -40,6 +40,16 @@ if (supportsTouch){
     canv.onmousedown = down;
     canv.onmousemove = move;
 }
+if (supportsTouch){
+    operationList.addEventListener("touchstart", operationList_down, false);
+    operationList.addEventListener("touchend", operationList_up, false);
+    operationList.addEventListener("touchmove", operationList_move, false);
+}else {
+    operationList.onmouseup = operationList_up;
+    operationList.onmousedown = operationList_down;
+    operationList.onmousemove = operationList_move;
+}
+
 
 var op_curve = document.getElementById("op_curve");
 var op_rect = document.getElementById("op_rect");
@@ -91,7 +101,6 @@ function down(event){
             var positX = event.changedTouches[0].pageX;
             var positY = event.changedTouches[0].pageY;
             event.preventDefault();
-            window.scroll(0,0)
         }else{
             // ignore touch event
             return
@@ -217,7 +226,6 @@ function move(event){
             var positX = event.changedTouches[0].pageX;
             var positY = event.changedTouches[0].pageY;
             event.preventDefault();
-            window.scroll(0,0)
         }else{
             // ignore touch event
             return
@@ -457,20 +465,25 @@ function renderList(load) {
         del.setAttribute('del_index',i);
         var newVar = all_operations[i];
         if ( current_operation == SELECT && select_operation == newVar
-            &&newVar.operation_code != 3 &&newVar.operation_code != 4
-            &&newVar.operation_code != 8 &&newVar.operation_code != 9){
+            && newVar.operation_code != 3 && newVar.operation_code != 4
+            && newVar.operation_code != 8 && newVar.operation_code != 9){
             text.style.color = "red";
         }
         var pOperation = newVar.operation_code;
         text.innerHTML = (i+1) + " : " + operationType[pOperation];
         operationList.appendChild(text);
-        if (newVar.operation_code != 3 &&newVar.operation_code != 4
-            &&newVar.operation_code != 8 &&newVar.operation_code != 9){
+        if (newVar.operation_code != 3 && newVar.operation_code != 4
+            && newVar.operation_code != 8 && newVar.operation_code != 9){
             text.appendChild(del);
         }
         del.id = "del";
-        text.addEventListener('click',selectItem);
-        del.onclick = string_delete;
+        if (supportsTouch){
+            text.addEventListener('touchstart',selectItem);
+            del.addEventListener('touchstart',string_delete);
+        }else {
+            text.addEventListener('click',selectItem);
+            del.onclick = string_delete;
+        }
     }
     if(!load) {
         operationList.scrollTo({top: operationList.scrollHeight - operationList.clientHeight, left: 0});
@@ -481,7 +494,7 @@ function selectItem (event) {
     select_operation = all_operations[index];
 }
 
-operationList.onmousedown = function(event){
+function operationList_down(event){
     isDown = false;
     inputTag = event.target;
     if(inputTag.id == 'del'){
@@ -495,7 +508,7 @@ operationList.onmousedown = function(event){
         isDown = true
     }
 };
-operationList.onmousemove = function(event){
+function operationList_move(event){
     if(isDown){
         scrolled = operationList.scrollTop;
         if(scrolled != scrolledTo){
@@ -505,7 +518,12 @@ operationList.onmousemove = function(event){
         scrolledTo = scrolled;
     }
 };
-operationList.onmouseup = function(event){
+function operationList_up(event){
+    inputTag = event.target;
+    if(inputTag.id == 'del'){
+        return;
+    }
+
     var newAtrebTag = event.pageY+operationList.scrollTop;
     newAtrebTag = Math.floor(newAtrebTag/(event.target.offsetHeight + 2));
     if (newAtrebTag >= all_operations.length ){
@@ -547,6 +565,7 @@ op_select.onclick = function(){
 };
 function string_delete(event){
     var index = event.target.getAttribute('del_index');
+    console.log(index);
     all_operations.splice(index,1);
     paint();
     isDown = false;
@@ -591,7 +610,11 @@ file_load.onclick = function(){
         for (i = 0; i < files.length;i++){
             var pTag = document.createElement("p");
             pTag.innerHTML = files[i];
-            pTag.onclick =openFile;
+            if (supportsTouch){
+                pTag.addEventListener("touchstart", openFile, false);
+            }else {
+                pTag.onclick =openFile;
+            }
             boxLoad.appendChild(pTag);
 
 		}
@@ -604,11 +627,21 @@ function clrScr(){
     function closeDialog(event){
         var boxLoad = document.getElementById("boxLoad");
         if(boxLoad && !isEqualElement (event.target,boxLoad)){
-            document.removeEventListener("click",closeDialog);
+            if (supportsTouch){
+                document.removeEventListener("touchstart",closeDialog);
+            }else {
+                document.removeEventListener("click",closeDialog);
+            }
             document.body.removeChild(boxLoad);
         }
     }
-	document.addEventListener("click",closeDialog);
+    if (supportsTouch){
+        document.addEventListener("touchstart", closeDialog, false);
+    }else {
+        document.addEventListener("click",closeDialog);
+    }
+
+
 }
 
 function resetpainter() {
