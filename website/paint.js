@@ -30,9 +30,16 @@ var operationList = document.getElementById('operationList');
 var current_operation = DRAW_CURVE;
 var all_operations = [];
 
-document.onmouseup = up;
-canv.onmousedown = down;
-canv.onmousemove = move;
+var supportsTouch = 'ontouchstart' in window || navigator.msMaxTouchPoints;
+if (supportsTouch){
+    canv.addEventListener("touchstart", down, false);
+    document.addEventListener("touchend", up, false);
+    canv.addEventListener("touchmove", move, false);
+}else {
+    document.onmouseup = up;
+    canv.onmousedown = down;
+    canv.onmousemove = move;
+}
 
 var op_curve = document.getElementById("op_curve");
 var op_rect = document.getElementById("op_rect");
@@ -76,11 +83,28 @@ var operationType = {
 };
 
 function down(event){
-	isDown = true;
-	if (current_operation == SELECT && select_operation){
-        coordinates.x = event.pageX;
-        coordinates.y = event.pageY;
-	    return;
+    isDown = true;
+    if(event.changedTouches){
+        // mobile
+        if(event.changedTouches.length == 1){
+            // draw something
+            var positX = event.changedTouches[0].pageX;
+            var positY = event.changedTouches[0].pageY;
+            event.preventDefault();
+            window.scroll(0,0)
+        }else{
+            // ignore touch event
+            return
+        }
+    }else{
+        //desktop
+        var positX = event.pageX
+        var positY = event.pageY
+    }
+    if (current_operation == SELECT && select_operation){
+        coordinates.x = positX;
+        coordinates.y = positY;
+        return;
     }
     switch(current_operation){
         case DRAW_CURVE:
@@ -91,8 +115,8 @@ function down(event){
             var curve_object = {
                 operation_code: DRAW_CURVE,
                 curve: [{
-                    x: event.pageX,
-                    y: event.pageY
+                    x: positX,
+                    y: positY
                 }]
             };
 
@@ -107,8 +131,8 @@ function down(event){
             var circle_object = {
                 operation_code: DRAW_CIRCLE,
                 circle: {
-                    x: event.pageX,
-                    y: event.pageY,
+                    x: positX,
+                    y: positY,
                     h: 0,
                     w: 0
                 }
@@ -122,8 +146,8 @@ function down(event){
             var rect_object = {
                 operation_code: DRAW_RECT,
                 rect: {
-                    x: event.pageX,
-                    y: event.pageY,
+                    x: positX,
+                    y: positY,
                     h: 0,
                     w: 0
                 }
@@ -136,8 +160,8 @@ function down(event){
             var line_object = {
                 operation_code: DRAW_LINE,
                 line: {
-                    sX: event.pageX,
-                    sY: event.pageY,
+                    sX: positX,
+                    sY: positY,
                     fX: 0,
                     fY: 0
                 }
@@ -146,34 +170,34 @@ function down(event){
         }
             break;
         case DRAW_TEXT:
-		{
-			var text = prompt("Введите текст");
-			if(!text){
-				// текст пустой
-				return;
-			}
+        {
+            var text = prompt("Введите текст");
+            if(!text){
+                // текст пустой
+                return;
+            }
 
             var sizeText = document.getElementById('textSise').value;
             var numberStyle = document.getElementById('styleType').selectedIndex;
             var styleText = textStyleType[numberStyle];
             var textParam = sizeText + "px " + styleText;
-			// создаем новый обьект текста!
-			// обьект текста имеет точку где спозиционирован текст!
-			var text_object = {
-				text: text,
-				operation_code: DRAW_TEXT,
-				position: {
-					x: event.pageX,
-					y: event.pageY,
+            // создаем новый обьект текста!
+            // обьект текста имеет точку где спозиционирован текст!
+            var text_object = {
+                text: text,
+                operation_code: DRAW_TEXT,
+                position: {
+                    x: positX,
+                    y: positY,
                     style: textParam
-				}
-			// добавляем наш обьект "text" в массив операций
-			};
-			all_operations.push(text_object);
-		}
-		break;
+                }
+                // добавляем наш обьект "text" в массив операций
+            };
+            all_operations.push(text_object);
+        }
+            break;
 
-	}
+    }
 }
 
 function up(){
@@ -186,11 +210,28 @@ function move(event){
     if(!isDown){ // ничего не делаем если мышка не нажата
         return;
     }
+    if(event.changedTouches){
+        // mobile
+        if(event.changedTouches.length == 1){
+            // draw something
+            var positX = event.changedTouches[0].pageX;
+            var positY = event.changedTouches[0].pageY;
+            event.preventDefault();
+            window.scroll(0,0)
+        }else{
+            // ignore touch event
+            return
+        }
+    }else{
+        //desktop
+        var positX = event.pageX
+        var positY = event.pageY
+    }
     if (current_operation == SELECT && select_operation){
-        var newX = event.pageX - coordinates.x;
-        var newY = event.pageY - coordinates.y;
-        coordinates.x = event.pageX;
-        coordinates.y = event.pageY;
+        var newX = positX - coordinates.x;
+        var newY = positY - coordinates.y;
+        coordinates.x = positX;
+        coordinates.y = positY;
         switch(select_operation.operation_code){
             case DRAW_CURVE:
             {
@@ -200,12 +241,12 @@ function move(event){
                     point.y += newY;
                 })
             }
-            break;
+                break;
             case DRAW_CIRCLE: {
                 select_operation.circle.x += newX;
                 select_operation.circle.y += newY;
             }
-            break;
+                break;
             case DRAW_RECT: {
                 select_operation.rect.x += newX;
                 select_operation.rect.y += newY;
@@ -232,25 +273,25 @@ function move(event){
     }
 
     switch(current_operation){
-		case DRAW_CURVE:
-		{
-			// берем последний обьект с массива.
-			// это должен быть обьект линии - так как мы уже нажали кнопку мышки и он уже создался!!!
-			var curve_object = all_operations[all_operations.length - 1];
-			
-			// добавляем в массив отрезков еще одну точку!
-			curve_object.curve.push({
-				x: event.pageX,
-				y: event.pageY
-			});
-		}
-		break;
+        case DRAW_CURVE:
+        {
+            // берем последний обьект с массива.
+            // это должен быть обьект линии - так как мы уже нажали кнопку мышки и он уже создался!!!
+            var curve_object = all_operations[all_operations.length - 1];
+
+            // добавляем в массив отрезков еще одну точку!
+            curve_object.curve.push({
+                x: positX,
+                y: positY
+            });
+        }
+            break;
         case DRAW_CIRCLE: {
             // берем с масива последний объект, координаты центра круга
             var circle_object = all_operations[all_operations.length - 1];
             // берем текущие координаты для радиуса круга
-            var nowX = event.pageX;
-            var nowY = event.pageY;
+            var nowX = positX;
+            var nowY = positY;
             //кординаты центра
             var centerX = circle_object.circle.x;
             var centerY = circle_object.circle.y;
@@ -270,8 +311,8 @@ function move(event){
             var stX = rect_object.rect.x;
             var stY = rect_object.rect.y;
 
-            var nowX = event.pageX;
-            var nowY = event.pageY;
+            var nowX = positX;
+            var nowY = positY;
 
             var endX = nowX - stX;
             var endY = nowY - stY;
@@ -284,19 +325,19 @@ function move(event){
             // берем с масива последний объект
             var line_object = all_operations[all_operations.length - 1];
 
-            line_object.line.fX = event.pageX;
-            line_object.line.fY = event.pageY;
+            line_object.line.fX = positX;
+            line_object.line.fY = positY;
 
         }
-        break;
+            break;
         case DRAW_TEXT:
         {
             // для текста мы ничего не делаем..... его не надо рисовать :)
         }
             break;
-	}
-	paint();
-}	
+    }
+    paint();
+}
 
 function paint(){
 	ctx.clearRect(0,0,canv.width ,canv.height);
