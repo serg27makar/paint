@@ -1,5 +1,12 @@
 var canv = document.getElementById("canv");
-var ctx = canv.getContext("2d");			
+var ctx = canv.getContext("2d");
+
+document.getElementById('canv').height = (window.innerHeight - 100);
+document.getElementById('canv').width = (window.innerWidth - 200);
+document.getElementById('operationList').height = (window.innerHeight - 200);
+document.getElementById("operationList").style.maxHeight =(window.innerHeight - 100);
+
+
 
 var isDown = false;
 
@@ -90,6 +97,14 @@ var operationType = {
     '7': "DRAW RECT",
     '8': "FILL COLOR",
     '9': "SET FILL COLOR"
+};
+
+window.onresize = function(event) {
+    document.getElementById('canv').height = (window.innerHeight - 100);
+    document.getElementById('canv').width = (window.innerWidth - 200)//Math.trunc((window.innerWidth / 5) * 4);
+    document.getElementById('operationList').height = (window.innerHeight - 100);
+    document.getElementById("operationList").style.maxHeight =(window.innerHeight - 100);
+
 };
 
 function down(event){
@@ -496,6 +511,7 @@ function selectItem (event) {
 
 function operationList_down(event){
     isDown = false;
+
     inputTag = event.target;
     if(inputTag.id == 'del'){
         return;
@@ -507,6 +523,7 @@ function operationList_down(event){
         posY = event.clientY;
         isDown = true
     }
+    return
 };
 function operationList_move(event){
     if(isDown){
@@ -520,7 +537,7 @@ function operationList_move(event){
 };
 function operationList_up(event){
     inputTag = event.target;
-    if(inputTag.id == 'del'){
+    if(inputTag.id == 'del' || operationList == event.target){
         return;
     }
 

@@ -1,5 +1,6 @@
 #canv{
 	border: rgba(132, 39, 54, 0.73) 1px solid;
+	margin: 2px;
 
 }
 #boxLoad {
@@ -13,28 +14,20 @@
 	font-family: cursive;
 }
 #operationList{
-	position: fixed;
-	top: .5em;
-	left: 51em;
-	height: 37.4em;
+	flex-direction: column;
 	width: 15em;
 	border-style: solid;
 	max-width: 100%;
-	max-height: 100%;
 	overflow: auto;
-
 }
 #del{
-	position: absolute;
-	left: 13em;
+	position: relative;
+	left: 5px;
 	padding: 7px 15px;
 	margin: auto;
 }
 #textBox {
 	border-style: solid;
-	position: fixed;
-	top: 38.5em;
-	left: 51em;
 	height: 3em;
 	width: 15em;
 }
@@ -43,8 +36,19 @@
 	margin: 2px;
 }
 p {
+	display: block;
 	border: 1px solid;
 	padding: 5px;
 	margin: 1px;
-	user-select: none;
+	font-size: small;
+	font-weight: bolder;
+}
+#head_contener{
+	display: flex;
+}
+#canv_contener{
+	display: flex;
+}
+#options_contener{
+	display: flex;
 }
